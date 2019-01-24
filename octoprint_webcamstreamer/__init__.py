@@ -13,7 +13,7 @@ import octoprint.plugin
 from octoprint.server import user_permission
 import docker
 
-class WebcamstreamerPlugin(
+class WebcamStreamerPlugin(
     octoprint.plugin.StartupPlugin,
     octoprint.plugin.TemplatePlugin,
     octoprint.plugin.AssetPlugin,
@@ -150,7 +150,7 @@ class WebcamstreamerPlugin(
         # for details.
         return dict(
             webcamstreamer=dict(
-                displayName="Webcamstreamer Plugin",
+                displayName="WebcamStreamer Plugin",
                 displayVersion=self._plugin_version,
 
                 # version check: github repository
@@ -168,11 +168,11 @@ class WebcamstreamerPlugin(
 # If you want your plugin to be registered within OctoPrint under a different name than what you defined in setup.py
 # ("OctoPrint-PluginSkeleton"), you may define that here. Same goes for the other metadata derived from setup.py that
 # can be overwritten via __plugin_xyz__ control properties. See the documentation for that.
-__plugin_name__ = "Webcamstreamer Plugin"
+__plugin_name__ = "WebcamStreamer Plugin"
 
 def __plugin_load__():
     global __plugin_implementation__
-    __plugin_implementation__ = WebcamstreamerPlugin()
+    __plugin_implementation__ = WebcamStreamerPlugin()
 
     global __plugin_hooks__
     __plugin_hooks__ = {
