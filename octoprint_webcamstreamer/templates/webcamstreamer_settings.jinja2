@@ -1,0 +1,45 @@
+<h4>YouTube Live Settings</h4>
+<form class="form-horizontal">
+    <h3>YouTube Live Viewing</h3>
+    <p>
+        Find your channel's user ID and channel ID's in your YouTube accounts <a href="http://www.youtube.com/account_advanced" target="_blank" rel="noopener">advanced account settings</a>.
+    </p>
+    <div class="control-group">
+        <label class="control-label">{{ _('YouTube Channel ID') }}</label>
+        <div class="controls">
+            <input type="text" class="input-block-level" data-bind="value: settings.plugins.webcamstreamer.channel_id" placeholder="Enter your personal channel id here">
+        </div>
+    </div>
+    <h3>YouTube Live Streaming</h3>
+    <p>
+        Find your stream parameters in your YouTube accounts <a href="https://www.youtube.com/live_dashboard" target="_blank" rel="noopener">live streaming dashboard</a>.
+    </p>
+    <div class="control-group">
+        <label class="control-label">{{ _('YouTube Server URL') }}</label>
+        <div class="controls">
+            <input type="text" class="input-block-level" data-bind="value: settings.plugins.webcamstreamer.stream_url" placeholder="Enter your live server URL here">
+        </div>
+    </div>
+    <div class="control-group">
+        <label class="control-label">{{ _('YouTube Stream Name/Key') }}</label>
+        <div class="controls">
+            <input type="text" class="input-block-level" data-bind="value: settings.plugins.webcamstreamer.stream_id" placeholder="Enter your live stream name/key here">
+        </div>
+    </div>
+    <h3>OctoPrint Webcam</h3>
+    <p>
+        Your OctoPrint webcam fully qualified URL would typically be <code>http://&lt;ip or hostname&gt;/webcam/?action=stream</code> or <code>http://&lt;ip or hostname&gt;:8080/?action=stream</code>.
+    </p>
+    <div class="control-group">
+        <label class="control-label">{{ _('Webcam URL') }}</label>
+        <div class="controls">
+            <input type="text" class="input-block-level" data-bind="value: settings.plugins.webcamstreamer.webcam_url" placeholder="Enter your OctoPi webcam URL here">
+        </div>
+    </div>
+    <div class="control-group" data-bind="visible: settings.plugins.webcamstreamer.stream_id().length > 0">
+        <label class="control-label">{{ _('Stream While Printing') }}</label>
+        <div class="controls">
+            <input class="input-checkbox" type="checkbox" data-bind="checked: settings.plugins.webcamstreamer.auto_start"></input>
+        </div>
+    </div>
+</form>
