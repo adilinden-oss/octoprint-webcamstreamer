@@ -1,17 +1,13 @@
 # OctoPrint-WebcamStreamer
 
-**TODO:** Describe what your plugin does.
+My first OctoPrint plugin! This branch just follows the OctoPrint docs [Plugin Tutorial](http://docs.octoprint.org/en/master/plugins/gettingstarted.html).
 
 ## Setup
 
-Install via the bundled [Plugin Manager](https://github.com/foosel/OctoPrint/wiki/Plugin:-Plugin-Manager)
-or manually using this URL:
+As this branch is strictly for the development tutorial, setup is by cloning the git repo to a local directory and installing it in `development` mode.
 
-    https://github.com/adilinden-oss/octoprint-webcamstreamer/archive/master.zip
-
-**TODO:** Describe how to install your plugin, if more needs to be done than just installing it via pip or through
-the plugin manager.
-
-## Configuration
-
-**TODO:** Describe your plugin's configuration options (if any).
+    mkdir ~/devel
+    cd ~/devel
+    git clone https://github.com/adilinden-oss/octoprint-webcamstreamer.git
+    cd octoprint-webcamstreamer
+    octoprint dev plugin:install
