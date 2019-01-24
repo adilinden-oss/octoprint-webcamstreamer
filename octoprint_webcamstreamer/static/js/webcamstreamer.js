@@ -9,8 +9,7 @@ $(function () {
         var self = this;
         
         self.settingsViewModel = parameters[0];
-        self.channel_id = ko.observable();
-        self.stream_id = ko.observable();
+        self.embed_url = ko.observable();
         self.streaming = ko.observable();
         self.processing = ko.observable(false);
         self.view_url = ko.observable();
@@ -39,13 +38,11 @@ $(function () {
         // already been initialized. It is especially guaranteed that this method gets called _after_ the settings
         // have been retrieved from the OctoPrint backend and thus the SettingsViewModel been properly populated.
         self.onBefireBinding = function () {
-            self.channel_id(self.settingsViewModel.settings.plugins.webcamstreamer.channel_id());
-            self.stream_id(self.settingsViewModel.settings.plugins.webcamstreamer.stream_id());
+            self.embed_url(self.settingsViewModel.settings.plugins.webcamstreamer.embed_url());
         };
 
         self.onEventSettingsUpdated = function (payload) {            
-            self.channel_id(self.settingsViewModel.settings.plugins.webcamstreamer.channel_id());
-            self.stream_id(self.settingsViewModel.settings.plugins.webcamstreamer.stream_id());
+            self.embed_url(self.settingsViewModel.settings.plugins.webcamstreamer.embed_url());
         };
         
         self.onAfterBinding = function() {
@@ -65,7 +62,7 @@ $(function () {
                 if(self.settingsViewModel.settings.webcam.streamRatio() == '4:3'){
                     $('#webcamstreamer_wrapper').css('padding-bottom','75%');
                 }
-                self.view_url('https://www.youtube.com/embed/live_stream?channel=' + self.settingsViewModel.settings.plugins.webcamstreamer.channel_id());
+                self.view_url(self.settingsViewModel.settings.plugins.webcamstreamer.embed_url());
             } else {
                 self.view_url('');
             }

@@ -22,20 +22,25 @@ class WebcamStreamerPlugin(
     octoprint.plugin.EventHandlerPlugin):
 
     def __init__(self):
-        self.client = docker.from_env()
+        # Docker connection and container object
+        self.client = None
+        self.image = None
         self.container = None
+
+        # Names (to become advanced options?)
+        self.image_name = "adilinden/rpi-stream:latest"
+        self.container_name = "WebcamStreamer"
+
     
     ##~~ StartupPlugin
     
     def on_after_startup(self):
-        self._logger.info("OctoPrint-WebcamStreamer loaded! Checking stream status.")
-        try:
-            self.container = self.client.containers.get('WebcamStreamer')
-            self._logger.info("%s is streaming " % self.container.name)
-            self._plugin_manager.send_plugin_message(self._identifier, dict(status=True,streaming=True))
-        except Exception, e:
-            self._logger.error(str(e))
-            self._plugin_manager.send_plugin_message(self._identifier, dict(status=True,streaming=False))
+        self._logger.info("OctoPrint-WebcamStreamer loaded!")
+        self._logger.info("Embed URL:" + self._settings.get(["embed_url"]))
+        self._logger.info("Stream URL:" + self._settings.get(["stream_url"]))
+        self._logger.info("Webcam URL:" + self._settings.get(["webcam_url"]))
+        self._get_image()
+        self._check_stream()
 
     ##~~ TemplatePlugin
     
@@ -47,10 +52,9 @@ class WebcamStreamerPlugin(
     def get_settings_defaults(self):
         return dict(
             # put your plugin's default settings here
-            channel_id="",
-            stream_url="rtmp://a.rtmp.youtube.com/live2",
-            stream_id="",
-            webcam_url="",
+            embed_url = "",
+            stream_url = "",
+            webcam_url = "",
             streaming=False,
             auto_start=False
         )
@@ -78,31 +82,56 @@ class WebcamStreamerPlugin(
         
         if command == 'startStream':
             self._logger.info("Start stream command received.")
-            self.startStream()
+            self._start_stream()
 
         if command == 'stopStream':
             self._logger.info("Stop stream command received.")
-            self.stopStream()
+            self._stop_stream()
 
         if command == 'checkStream':
             self._logger.info("Checking stream status.")
-            if self.container:
-                self._plugin_manager.send_plugin_message(self._identifier, dict(status=True,streaming=True))
-            else:
-                self._plugin_manager.send_plugin_message(self._identifier, dict(status=True,streaming=False))
+            self._check_stream()
 
     ##-- EventHandlerPlugin
     
     def on_event(self, event, payload):
         if event == "PrintStarted" and self._settings.get(["auto_start"]):
-            self.startStream()
+            self._start_stream()
             
         if event in ["PrintDone","PrintCancelled"] and self._settings.get(["auto_start"]):
-            self.stopStream()
+            self._stop_stream()
 
     ##-- Utility Functions
+
+    def _get_client(self):
+        self.client = docker.from_env()
+        try:
+            self.client.ping()
+        except Exception, e:
+            self._logger.error('Docker not responding: ' + str(e))
+            self.client = None
+
+    def _get_image(self):
+        self._get_client()
+        if self.client:
+            try:
+                self.image = self.client.images.get(self.image_name)
+            except Exception, e:
+                self._logger.error(str(e))
+                self._logger.error('Please read installation instructions!')
+                self.image = None
+
+    def _get_container(self):
+        self._get_client()
+        if self.client:
+            try:
+                self.container = self.client.containers.get(self.container_name)
+            except Exception, e:
+                self.client = None
+                self.container = None
     
-    def startStream(self):
+    def _start_stream(self):
+        self._get_container()
         if not self.container:
             filters = []
             if self._settings.global_get(["webcam","flipH"]):
@@ -115,7 +144,7 @@ class WebcamStreamerPlugin(
                 filters.append("null")
             try:
                 self.container = self.client.containers.run(
-                    "adilinden/rpi-stream:latest",
+                    self.image_name,
                     command=[
                         "octopi-youtubelive",
                         self._settings.get(["webcam_url"]),
@@ -124,14 +153,15 @@ class WebcamStreamerPlugin(
                         ",".join(filters)],
                         detach=True,
                         privileged=True,
-                        name="WebcamStreamer",
+                        name=self.container_name,
                         auto_remove=True)
                 self._plugin_manager.send_plugin_message(self._identifier, dict(status=True,streaming=True))
             except Exception, e:
                 self._plugin_manager.send_plugin_message(self._identifier, dict(error=str(e),status=True,streaming=False))
         return
         
-    def stopStream(self):
+    def _stop_stream(self):
+        self._get_container()
         if self.container:
             try:
                 self.container.stop()
@@ -140,6 +170,15 @@ class WebcamStreamerPlugin(
             except Exception, e:
                 self._plugin_manager.send_plugin_message(self._identifier, dict(error=str(e),status=True,streaming=False))
         else:
+            self._plugin_manager.send_plugin_message(self._identifier, dict(status=True,streaming=False))
+
+    def _check_stream(self):
+        self._get_container()
+        if self.container:
+            self._logger.info("%s is streaming " % self.container.name)
+            self._plugin_manager.send_plugin_message(self._identifier, dict(status=True,streaming=True))
+        else:
+            self._logger.info("stream is inactive ")
             self._plugin_manager.send_plugin_message(self._identifier, dict(status=True,streaming=False))
 
     ##~~ Softwareupdate hook

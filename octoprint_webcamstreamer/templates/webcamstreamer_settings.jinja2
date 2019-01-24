@@ -1,45 +1,83 @@
-<h4>YouTube Live Settings</h4>
 <form class="form-horizontal">
-    <h3>YouTube Live Viewing</h3>
-    <p>
-        Find your channel's user ID and channel ID's in your YouTube accounts <a href="http://www.youtube.com/account_advanced" target="_blank" rel="noopener">advanced account settings</a>.
-    </p>
-    <div class="control-group">
-        <label class="control-label">{{ _('YouTube Channel ID') }}</label>
+    <h4>WebcamStreamer Viewer</h4>
+    <div class="control-group" title="URL to embed into the UI for viewing of the live stream">
+        <label class="control-label">{{ _('Viewer Embed URL') }}</label>
         <div class="controls">
-            <input type="text" class="input-block-level" data-bind="value: settings.plugins.webcamstreamer.channel_id" placeholder="Enter your personal channel id here">
+            <input type="text" class="input-block-level" data-bind="value: settings.plugins.webcamstreamer.embed_url" placeholder="Example: https://www.youtube.com/embed/live_stream?channel=XXXXXXXX">
+            <span class="help-inline">The URL of the embeddable video player displaying the live stream in the WebcamStreamer tab.</span>
         </div>
     </div>
-    <h3>YouTube Live Streaming</h3>
-    <p>
-        Find your stream parameters in your YouTube accounts <a href="https://www.youtube.com/live_dashboard" target="_blank" rel="noopener">live streaming dashboard</a>.
-    </p>
-    <div class="control-group">
-        <label class="control-label">{{ _('YouTube Server URL') }}</label>
-        <div class="controls">
-            <input type="text" class="input-block-level" data-bind="value: settings.plugins.webcamstreamer.stream_url" placeholder="Enter your live server URL here">
+    <div class="viewer_additional">
+        <div><small><a href="#" class="muted" data-bind="toggleContent: { class: 'fa-caret-right fa-caret-down', parent: '.viewer_additional', container: '.hide' }"><i class="fa fa-caret-right"></i> Additional Information</a></small></div>
+        <div class="hide">
+            <table class="table table-striped table-condensed table-fit">
+                <thead>
+                <tr>
+                    <th>Service</th>
+                    <th>Example URL</th>
+                    <th>Note</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td>YouTube Live</td>
+                    <td>https://www.youtube.com/embed/live_stream?channel=CHANNEL_ID</td>
+                    <td>Channel ID: <a href="http://www.youtube.com/account_advanced" target="_blank" rel="noopener">Advanced Account Settings</a></td>
+                </tr>
+                <tr>
+                    <td>Twitch</td>
+                    <td>https://player.twitch.tv/?channel=USERNAME</td>
+                    <td></td>
+                </tr>
+                </tbody>
+            </table>
         </div>
     </div>
-    <div class="control-group">
-        <label class="control-label">{{ _('YouTube Stream Name/Key') }}</label>
+    <h4>WebcamStreamer Stream Parameters</h4>
+    <div class="control-group" title="URL to send the RTMP stream to">
+        <label class="control-label">{{ _('Stream Server URL') }}</label>
         <div class="controls">
-            <input type="text" class="input-block-level" data-bind="value: settings.plugins.webcamstreamer.stream_id" placeholder="Enter your live stream name/key here">
+            <input type="text" class="input-block-level" data-bind="value: settings.plugins.webcamstreamer.stream_url" placeholder="Example: rtmp://a.rtmp.youtube.com/live2/xxxx-xxxx-xxxx-xxxx">
+            <span class="help-inline">The destination URL for the streaming server. This URL typically contains the secret stream name or stream key.</span>
         </div>
     </div>
-    <h3>OctoPrint Webcam</h3>
-    <p>
-        Your OctoPrint webcam fully qualified URL would typically be <code>http://&lt;ip or hostname&gt;/webcam/?action=stream</code> or <code>http://&lt;ip or hostname&gt;:8080/?action=stream</code>.
-    </p>
-    <div class="control-group">
-        <label class="control-label">{{ _('Webcam URL') }}</label>
-        <div class="controls">
-            <input type="text" class="input-block-level" data-bind="value: settings.plugins.webcamstreamer.webcam_url" placeholder="Enter your OctoPi webcam URL here">
+    <div class="stream_additional">
+        <div><small><a href="#" class="muted" data-bind="toggleContent: { class: 'fa-caret-right fa-caret-down', parent: '.stream_additional', container: '.hide' }"><i class="fa fa-caret-right"></i> Additional Information</a></small></div>
+        <div class="hide">
+            <table class="table table-striped table-condensed table-fit">
+                <thead>
+                <tr>
+                    <th>Service</th>
+                    <th>Link to information</th>
+                    <th>Example URL</th>
+                </tr>
+                </thead>
+                <tr>
+                    <td>YouTube Live</td>
+                    <td><a href="https://www.youtube.com/live_dashboard" target="_blank" rel="noopener">Live Streaming Dashboard</a></td>
+                    <td>rtmp://a.rtmp.youtube.com/live2/xxxx-xxxx-xxxx-xxxx</td>
+                </tr>
+                <tr>
+                    <td>Twitch</td>
+                    <td><a href="https://www.twitch.tv/dashboard/settings" target="_blank" rel="noopener">Channel Dashboard</a></td>
+                    <td>rtmp://live.twitch.tv/app/live_xxxxxxxxx_xxxxxxxxxx</td>
+                </tr>
+            </table>
         </div>
     </div>
-    <div class="control-group" data-bind="visible: settings.plugins.webcamstreamer.stream_id().length > 0">
+    <div class="control-group" title="OctoPi Webcam URL">
+        <label class="control-label">{{ _('OctoPi Webcam URL') }}</label>
+        <div class="controls">
+            <input type="text" class="input-block-level" data-bind="value: settings.plugins.webcamstreamer.webcam_url" placeholder="Example: http://192.168.1.10:8080/?action=stream">
+            <span class="help-inline">The fully qualified URL including hostname or IP address for the OctoPi webcam.</span>
+        </div>
+    </div>
+    <div class="control-group" title="Stream while printing">
         <label class="control-label">{{ _('Stream While Printing') }}</label>
         <div class="controls">
             <input class="input-checkbox" type="checkbox" data-bind="checked: settings.plugins.webcamstreamer.auto_start"></input>
+            <span class="help-inline">Check the box to have the stream start and stop automatically with printing.</span>
         </div>
     </div>
+    <h4>Advanced Settings</h4>
 </form>
