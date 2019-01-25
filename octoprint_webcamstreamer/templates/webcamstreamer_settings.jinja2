@@ -91,10 +91,11 @@
     <div class="ffmpeg_additional">
         <div><small><a href="#" class="muted" data-bind="toggleContent: { class: 'fa-caret-right fa-caret-down', parent: '.ffmpeg_additional', container: '.hide' }"><i class="fa fa-caret-right"></i> Additional Information</a></small></div>
         <div class="hide">
+            <p>Default value: <code>-re -f mjpeg -framerate 5 -i {webcam_url} -ar 44100 -ac 2 -acodec pcm_s16le -f s16le -ac 2 -i /dev/zero -acodec aac -ab 128k -vcodec h264 -pix_fmt yuv420p -framerate {frame_rate} -g {gop_size} -strict experimental -filter:v {filter} -f flv {stream_url}</code></p>
             <table class="table table-striped table-condensed table-fit">
                 <thead>
                 <tr>
-                    <th>FFmpeg Command Var</th>
+                    <th>FFmpeg Cmd Var</th>
                     <th>Settings Value</th>
                 </tr>
                 </thead>
