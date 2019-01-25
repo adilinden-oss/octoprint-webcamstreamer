@@ -167,12 +167,12 @@ class WebcamStreamerPlugin(octoprint.plugin.StartupPlugin,
                     privileged = True,
                     name = self._settings.get(["docker_container"]),
                     auto_remove = True)
-                self._plugin_manager.send_plugin_message(self._identifier, dict(status=True,streaming=True))
             except Exception, e:
                 self._logger.error(str(e))
                 self._plugin_manager.send_plugin_message(self._identifier, dict(error=str(e),status=True,streaming=False))
             else:
                 self._logger.info("Stream started successfully")
+                self._plugin_manager.send_plugin_message(self._identifier, dict(success="Stream started",status=True,streaming=True))
         return
         
     def _stop_stream(self):
@@ -181,12 +181,12 @@ class WebcamStreamerPlugin(octoprint.plugin.StartupPlugin,
             try:
                 self.container.stop()
                 self.container = None
-                self._plugin_manager.send_plugin_message(self._identifier, dict(status=True,streaming=False))
             except Exception, e:
                 self._logger.error(str(e))
                 self._plugin_manager.send_plugin_message(self._identifier, dict(error=str(e),status=True,streaming=False))
             else:
                 self._logger.info("Stream stopped successfully")
+                self._plugin_manager.send_plugin_message(self._identifier, dict(success="Stream stopped",status=True,streaming=False))
         else:
             self._plugin_manager.send_plugin_message(self._identifier, dict(status=True,streaming=False))
 

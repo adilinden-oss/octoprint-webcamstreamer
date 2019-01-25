@@ -81,7 +81,7 @@ $(function () {
             
             if(data.error) {
                 new PNotify({
-                    title: 'Webcam Streamer Error',
+                    title: 'WebcamStreamer Error',
                     text: data.error,
                     type: 'error',
                     hide: false,
@@ -94,10 +94,11 @@ $(function () {
 
             if(data.success) {
                 new PNotify({
-                    title: 'Webcam Streamer',
+                    title: 'WebcamStreamer',
                     text: data.success,
                     type: 'success',
-                    hide: false,
+                    hide: true,
+                    delay: 6000,
                     buttons: {
                         closer: true,
                         sticker: false
