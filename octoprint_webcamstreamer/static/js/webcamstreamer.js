@@ -9,12 +9,10 @@ $(function () {
         var self = this;
         
         self.settingsViewModel = parameters[0];
+        self.is_configured = ko.observable();
         self.embed_url = ko.observable();
-        self.stream_url = ko.observable();
-        self.webcam_url = ko.observable();
         self.streaming = ko.observable();
         self.processing = ko.observable(false);
-        self.view_url = ko.observable();
         self.icon = ko.pureComputed(function() {
             var icons = [];
             if (self.streaming() && !self.processing()) {
@@ -39,16 +37,26 @@ $(function () {
         // This will get called before the WebcamStreamerViewModel gets bound to the DOM, but after its depedencies have
         // already been initialized. It is especially guaranteed that this method gets called _after_ the settings
         // have been retrieved from the OctoPrint backend and thus the SettingsViewModel been properly populated.
-        self.onBefireBinding = function () {
+        self.onBeforeBinding = function () {
+            if(self.settingsViewModel.settings.plugins.webcamstreamer.embed_url() &&
+                    self.settingsViewModel.settings.plugins.webcamstreamer.embed_url() &&
+                    self.settingsViewModel.settings.plugins.webcamstreamer.webcam_url()) {
+                self.is_configured(true);
+            } else {
+                self.is_configured(false);
+            }
             self.embed_url(self.settingsViewModel.settings.plugins.webcamstreamer.embed_url());
-            self.stream_url(self.settingsViewModel.settings.plugins.webcamstreamer.stream_url());
-            self.webcam_url(self.settingsViewModel.settings.plugins.webcamstreamer.webcam_url());
         };
 
         self.onEventSettingsUpdated = function (payload) {            
+            if(self.settingsViewModel.settings.plugins.webcamstreamer.embed_url() &&
+                    self.settingsViewModel.settings.plugins.webcamstreamer.embed_url() &&
+                    self.settingsViewModel.settings.plugins.webcamstreamer.webcam_url()) {
+                self.is_configured(true);
+            } else {
+                self.is_configured(false);
+            }
             self.embed_url(self.settingsViewModel.settings.plugins.webcamstreamer.embed_url());
-            self.stream_url(self.settingsViewModel.settings.plugins.webcamstreamer.stream_url());
-            self.webcam_url(self.settingsViewModel.settings.plugins.webcamstreamer.webcam_url());
         };
         
         self.onAfterBinding = function() {
@@ -68,9 +76,9 @@ $(function () {
                 if(self.settingsViewModel.settings.webcam.streamRatio() == '4:3'){
                     $('#webcamstreamer_wrapper').css('padding-bottom','75%');
                 }
-                self.view_url(self.settingsViewModel.settings.plugins.webcamstreamer.embed_url());
+                self.embed_url(self.settingsViewModel.settings.plugins.webcamstreamer.embed_url());
             } else {
-                self.view_url('');
+                self.embed_url('');
             }
         }
         
