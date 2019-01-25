@@ -4,7 +4,7 @@
         <label class="control-label">{{ _('Viewer Embed URL') }}</label>
         <div class="controls">
             <input type="text" class="input-block-level" data-bind="value: settings.plugins.webcamstreamer.embed_url" placeholder="Example: https://www.youtube.com/embed/live_stream?channel=XXXXXXXX">
-            <span class="help-inline">The URL of the embeddable video player displaying the live stream in the WebcamStreamer tab.</span>
+            <span class="help-block">The URL of the embeddable video player displaying the live stream in the WebcamStreamer tab.</span>
         </div>
     </div>
     <div class="viewer_additional">
@@ -38,7 +38,7 @@
         <label class="control-label">{{ _('Stream Server URL') }}</label>
         <div class="controls">
             <input type="text" class="input-block-level" data-bind="value: settings.plugins.webcamstreamer.stream_url" placeholder="Example: rtmp://a.rtmp.youtube.com/live2/xxxx-xxxx-xxxx-xxxx">
-            <span class="help-inline">The destination URL for the streaming server. This URL typically contains the secret stream name or stream key.</span>
+            <span class="help-block">The destination URL for the streaming server. This URL typically contains the secret stream name or stream key.</span>
         </div>
     </div>
     <div class="stream_additional">
@@ -65,19 +65,87 @@
             </table>
         </div>
     </div>
-    <div class="control-group" title="OctoPi Webcam URL">
+    <div class="control-group" title="URL of the OctoPi webcam">
         <label class="control-label">{{ _('OctoPi Webcam URL') }}</label>
         <div class="controls">
             <input type="text" class="input-block-level" data-bind="value: settings.plugins.webcamstreamer.webcam_url" placeholder="Example: http://192.168.1.10:8080/?action=stream">
-            <span class="help-inline">The fully qualified URL including hostname or IP address for the OctoPi webcam.</span>
+            <span class="help-block">The fully qualified URL including hostname or IP address for the OctoPi webcam.</span>
         </div>
     </div>
     <div class="control-group" title="Stream while printing">
         <label class="control-label">{{ _('Stream While Printing') }}</label>
         <div class="controls">
             <input class="input-checkbox" type="checkbox" data-bind="checked: settings.plugins.webcamstreamer.auto_start"></input>
-            <span class="help-inline">Check the box to have the stream start and stop automatically with printing.</span>
+            <span class="help-block">Check the box to have the stream start and stop automatically with printing.</span>
         </div>
     </div>
+    <hr />
     <h4>Advanced Settings</h4>
+    <div class="control-group" title="The complete ffmpeg command to execute for streaming">
+        <label class="control-label">{{ _('FFmpeg Command') }}</label>
+        <div class="controls">
+            <input type="text" class="input-block-level" data-bind="value: settings.plugins.webcamstreamer.ffmpeg_cmd">
+            <span class="help-block"><b>Expert Use Only!</b> This is the FFmpeg command executed for streaming activity. Variable substitution is performed to insert the appropriate values into the command line. Consult the FFmpeg manual for details on its use.</span>
+        </div>
+    </div>
+    <div class="ffmpeg_additional">
+        <div><small><a href="#" class="muted" data-bind="toggleContent: { class: 'fa-caret-right fa-caret-down', parent: '.ffmpeg_additional', container: '.hide' }"><i class="fa fa-caret-right"></i> Additional Information</a></small></div>
+        <div class="hide">
+            <table class="table table-striped table-condensed table-fit">
+                <thead>
+                <tr>
+                    <th>FFmpeg Command Var</th>
+                    <th>Settings Value</th>
+                </tr>
+                </thead>
+                <tr>
+                    <td>{stream_url}</td>
+                    <td>Stream Server URL</td>
+                </tr>
+                <tr>
+                    <td>{webcam_url}</td>
+                    <td>OctoPi Webcam URL</td>
+                </tr>
+                <tr>
+                    <td>{frame_rate}</td>
+                    <td>OctoPi Webcam Frame Rate</td>
+                </tr>
+                <tr>
+                    <td>{gop_size}</td>
+                    <td>Internal Calculated Value (frame rate * 2)</td>
+                </tr>
+                <tr>
+                    <td>{filter}</td>
+                    <td>Internal Calculated Value</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+
+
+    <div class="control-group" title="The OctoPi webcam frame rate (default: 5 fps)">
+        <label class="control-label">{{ _('Webcam Frame Rate') }}</label>
+        <div class="controls">
+            <div class="input-append">
+                <input type="number" class="input-mini" min="1" max="60" data-bind="value: settings.plugins.webcamstreamer.frame_rate">
+                <span class="add-on">fps</span>
+            </div>
+            <span class="help-block">The OctoPi webcam frame rate (default: 5 fps).</span>
+        </div>
+    </div>
+    <div class="control-group" title="The name and tag of the Docker image to use (default: adilinden/rpi-ffmpeg:latest)">
+        <label class="control-label">{{ _('Docker Image Name:Tag') }}</label>
+        <div class="controls">
+            <input type="text" class="input-block-level" data-bind="value: settings.plugins.webcamstreamer.docker_image">
+            <span class="help-block">The name and tag of the Docker image to use (default: adilinden/rpi-ffmpeg:latest).</span>
+        </div>
+    </div>
+    <div class="control-group" title="The name given to the running Docker container (default: WebStreamer)">
+        <label class="control-label">{{ _('Docker Container Name') }}</label>
+        <div class="controls">
+            <input type="text" class="input-block-level" data-bind="value: settings.plugins.webcamstreamer.docker_container">
+            <span class="help-block">The name given to the running Docker container (default: WebStreamer).</span>
+        </div>
+    </div>
 </form>

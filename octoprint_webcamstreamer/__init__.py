@@ -13,32 +13,31 @@ import octoprint.plugin
 from octoprint.server import user_permission
 import docker
 
-class WebcamStreamerPlugin(
-    octoprint.plugin.StartupPlugin,
-    octoprint.plugin.TemplatePlugin,
-    octoprint.plugin.AssetPlugin,
-    octoprint.plugin.SettingsPlugin,
-    octoprint.plugin.SimpleApiPlugin,
-    octoprint.plugin.EventHandlerPlugin):
+class WebcamStreamerPlugin(octoprint.plugin.StartupPlugin,
+                           octoprint.plugin.TemplatePlugin,
+                           octoprint.plugin.AssetPlugin,
+                           octoprint.plugin.SettingsPlugin,
+                           octoprint.plugin.SimpleApiPlugin,
+                           octoprint.plugin.EventHandlerPlugin):
 
     def __init__(self):
         # Docker connection and container object
         self.client = None
         self.image = None
         self.container = None
-
-        # Names (to become advanced options?)
-        self.image_name = "adilinden/rpi-stream:latest"
-        self.container_name = "WebcamStreamer"
-
     
     ##~~ StartupPlugin
     
     def on_after_startup(self):
-        self._logger.info("OctoPrint-WebcamStreamer loaded!")
-        self._logger.info("Embed URL:" + self._settings.get(["embed_url"]))
-        self._logger.info("Stream URL:" + self._settings.get(["stream_url"]))
-        self._logger.info("Webcam URL:" + self._settings.get(["webcam_url"]))
+        self._logger.info(
+            "OctoPrint-WebcamStreamer loaded! \n"
+            + "|  embed_url = " + self._settings.get(["embed_url"]) + "\n"
+            + "|  stream_url = " + self._settings.get(["stream_url"]) + "\n"
+            + "|  webcam_url = " + self._settings.get(["webcam_url"]) + "\n"
+            + "|  docker_image = " + self._settings.get(["docker_image"]) + "\n"
+            + "|  docker_container = " + self._settings.get(["docker_container"]) + "\n"
+            + "|  frame_rate = " + str(self._settings.get(["frame_rate"])) + "\n"
+            + "|  ffmpeg_cmd = " + self._settings.get(["ffmpeg_cmd"]))
         self._get_image()
         self._check_stream()
 
@@ -55,8 +54,16 @@ class WebcamStreamerPlugin(
             embed_url = "",
             stream_url = "",
             webcam_url = "",
-            streaming=False,
-            auto_start=False
+            streaming = False,
+            auto_start = False,
+            ffmpeg_cmd = "-re -f mjpeg -framerate 5 -i {webcam_url} "                                                                       # Video input
+                       + "-ar 44100 -ac 2 -acodec pcm_s16le -f s16le -ac 2 -i /dev/zero "                                                   # Audio input
+                       + "-acodec aac -ab 128k "                                                                                            # Audio output
+                       + "-vcodec h264 -pix_fmt yuv420p -framerate {frame_rate} -g {gop_size} -strict experimental -filter:v {filter} "     # Video output
+                       + "-f flv {stream_url}",                                                                                             # Output stream
+            frame_rate = 5,
+            docker_image = "adilinden/rpi-ffmpeg:latest",
+            docker_container = "WebStreamer"
         )
 
     ##~~ AssetPlugin mixin
@@ -108,24 +115,24 @@ class WebcamStreamerPlugin(
         try:
             self.client.ping()
         except Exception, e:
-            self._logger.error('Docker not responding: ' + str(e))
+            self._logger.error("Docker not responding: " + str(e))
             self.client = None
 
     def _get_image(self):
         self._get_client()
         if self.client:
             try:
-                self.image = self.client.images.get(self.image_name)
+                self.image = self.client.images.get(self._settings.get(["docker_image"]))
             except Exception, e:
                 self._logger.error(str(e))
-                self._logger.error('Please read installation instructions!')
+                self._logger.error("Please read installation instructions!")
                 self.image = None
 
     def _get_container(self):
         self._get_client()
         if self.client:
             try:
-                self.container = self.client.containers.get(self.container_name)
+                self.container = self.client.containers.get(self._settings.get(["docker_container"]))
             except Exception, e:
                 self.client = None
                 self.container = None
@@ -142,22 +149,30 @@ class WebcamStreamerPlugin(
                 filters.append("transpose=cclock")
             if len(filters) == 0:
                 filters.append("null")
+            gop_size = self._settings.get(["frame_rate"]) * 2
+            # Substitute vars in ffmpeg command
+            docker_cmd = "ffmpeg " + self._settings.get(["ffmpeg_cmd"]).format(
+                webcam_url = self._settings.get(["webcam_url"]),
+                stream_url = self._settings.get(["stream_url"]),
+                frame_rate = self._settings.get(["frame_rate"]),
+                gop_size = gop_size,
+                filter = ",".join(filters))
+            self._logger.info("Launching docker container '" + self._settings.get(["docker_container"]) + "':\n" + "|  " + docker_cmd)
             try:
+                self._get_client()
                 self.container = self.client.containers.run(
-                    self.image_name,
-                    command=[
-                        "octopi-youtubelive",
-                        self._settings.get(["webcam_url"]),
-                        self._settings.get(["stream_url"]),
-                        self._settings.get(["stream_id"]),
-                        ",".join(filters)],
-                        detach=True,
-                        privileged=True,
-                        name=self.container_name,
-                        auto_remove=True)
+                    self._settings.get(["docker_image"]),
+                    command = docker_cmd,
+                    detach = True,
+                    privileged = True,
+                    name = self._settings.get(["docker_container"]),
+                    auto_remove = True)
                 self._plugin_manager.send_plugin_message(self._identifier, dict(status=True,streaming=True))
             except Exception, e:
+                self._logger.error(str(e))
                 self._plugin_manager.send_plugin_message(self._identifier, dict(error=str(e),status=True,streaming=False))
+            else:
+                self._logger.info("Stream started successfully")
         return
         
     def _stop_stream(self):
@@ -168,7 +183,10 @@ class WebcamStreamerPlugin(
                 self.container = None
                 self._plugin_manager.send_plugin_message(self._identifier, dict(status=True,streaming=False))
             except Exception, e:
+                self._logger.error(str(e))
                 self._plugin_manager.send_plugin_message(self._identifier, dict(error=str(e),status=True,streaming=False))
+            else:
+                self._logger.info("Stream stopped successfully")
         else:
             self._plugin_manager.send_plugin_message(self._identifier, dict(status=True,streaming=False))
 

@@ -10,6 +10,8 @@ $(function () {
         
         self.settingsViewModel = parameters[0];
         self.embed_url = ko.observable();
+        self.stream_url = ko.observable();
+        self.webcam_url = ko.observable();
         self.streaming = ko.observable();
         self.processing = ko.observable(false);
         self.view_url = ko.observable();
@@ -39,10 +41,14 @@ $(function () {
         // have been retrieved from the OctoPrint backend and thus the SettingsViewModel been properly populated.
         self.onBefireBinding = function () {
             self.embed_url(self.settingsViewModel.settings.plugins.webcamstreamer.embed_url());
+            self.stream_url(self.settingsViewModel.settings.plugins.webcamstreamer.stream_url());
+            self.webcam_url(self.settingsViewModel.settings.plugins.webcamstreamer.webcam_url());
         };
 
         self.onEventSettingsUpdated = function (payload) {            
             self.embed_url(self.settingsViewModel.settings.plugins.webcamstreamer.embed_url());
+            self.stream_url(self.settingsViewModel.settings.plugins.webcamstreamer.stream_url());
+            self.webcam_url(self.settingsViewModel.settings.plugins.webcamstreamer.webcam_url());
         };
         
         self.onAfterBinding = function() {
@@ -75,15 +81,28 @@ $(function () {
             
             if(data.error) {
                 new PNotify({
-                            title: 'Webcam Streamer Error',
-                            text: data.error,
-                            type: 'error',
-                            hide: false,
-                            buttons: {
-                                closer: true,
-                                sticker: false
-                            }
-                            });
+                    title: 'Webcam Streamer Error',
+                    text: data.error,
+                    type: 'error',
+                    hide: false,
+                    buttons: {
+                        closer: true,
+                        sticker: false
+                    }
+                });
+            }
+
+            if(data.success) {
+                new PNotify({
+                    title: 'Webcam Streamer',
+                    text: data.success,
+                    type: 'success',
+                    hide: false,
+                    buttons: {
+                        closer: true,
+                        sticker: false
+                    }
+                });
             }
             
             if(data.status) {
