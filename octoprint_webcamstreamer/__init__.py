@@ -28,7 +28,7 @@ class WebcamStreamerPlugin(octoprint.plugin.StartupPlugin,
     
         self.frame_rate_default = 5
         self.ffmpeg_cmd_default = (
-            "-re -f mjpeg -framerate 5 -i {webcam_url} "                                                                   # Video input
+            "ffmpeg -re -f mjpeg -framerate 5 -i {webcam_url} "                                                                   # Video input
             "-ar 44100 -ac 2 -acodec pcm_s16le -f s16le -ac 2 -i /dev/zero "                                               # Audio input
             "-acodec aac -ab 128k "                                                                                        # Audio output
             "-vcodec h264 -pix_fmt yuv420p -framerate {frame_rate} -g {gop_size} -strict experimental -filter:v {filter} " # Video output
@@ -55,6 +55,14 @@ class WebcamStreamerPlugin(octoprint.plugin.StartupPlugin,
     
     def get_template_configs(self):
         return [dict(type="settings",custom_bindings=False)]
+
+    def get_template_vars(self):
+        return dict(
+            frame_rate_default = self.frame_rate_default,
+            ffmpeg_cmd_default = self.ffmpeg_cmd_default,
+            docker_image_default = self.docker_image_default,
+            docker_container_default = self.docker_container_default
+        )
 
     ##~~ SettingsPlugin mixin
 
@@ -163,7 +171,7 @@ class WebcamStreamerPlugin(octoprint.plugin.StartupPlugin,
                 filters.append("null")
             gop_size = self._settings.get(["frame_rate"]) * 2
             # Substitute vars in ffmpeg command
-            docker_cmd = "ffmpeg " + self._settings.get(["ffmpeg_cmd"]).format(
+            docker_cmd = self._settings.get(["ffmpeg_cmd"]).format(
                 webcam_url = self._settings.get(["webcam_url"]),
                 stream_url = self._settings.get(["stream_url"]),
                 frame_rate = self._settings.get(["frame_rate"]),

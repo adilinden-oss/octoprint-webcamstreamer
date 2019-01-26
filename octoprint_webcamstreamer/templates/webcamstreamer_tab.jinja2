@@ -1,6 +1,6 @@
-<div data-bind="visible: is_configured()">
+<div data-bind="visible: is_configured">
 	<div id="webcamstreamer_wrapper">
-		<iframe data-bind="attr: {src: embed_url()}" frameborder="0" allowfullscreen></iframe>
+		<iframe data-bind="attr: {src: embed_url}" frameborder="0" allowfullscreen></iframe>
 	</div>
 	<div class="row-fluid btn-group" style="text-align: center;padding-top: 20px;">
 		<button class="btn" data-bind="click: toggleStream, css: btnclass, disable:processing"><i data-bind="css: icon"></i><span data-bind="text: streaming() ? '  Stop' : '  Go Live'"></span></button>
