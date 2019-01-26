@@ -39,7 +39,7 @@ $(function () {
         // have been retrieved from the OctoPrint backend and thus the SettingsViewModel been properly populated.
         self.onBeforeBinding = function () {
             if(self.settingsViewModel.settings.plugins.webcamstreamer.embed_url() &&
-                    self.settingsViewModel.settings.plugins.webcamstreamer.embed_url() &&
+                    self.settingsViewModel.settings.plugins.webcamstreamer.stream_url() &&
                     self.settingsViewModel.settings.plugins.webcamstreamer.webcam_url()) {
                 self.is_configured(true);
             } else {
@@ -50,7 +50,7 @@ $(function () {
 
         self.onEventSettingsUpdated = function (payload) {            
             if(self.settingsViewModel.settings.plugins.webcamstreamer.embed_url() &&
-                    self.settingsViewModel.settings.plugins.webcamstreamer.embed_url() &&
+                    self.settingsViewModel.settings.plugins.webcamstreamer.stream_url() &&
                     self.settingsViewModel.settings.plugins.webcamstreamer.webcam_url()) {
                 self.is_configured(true);
             } else {
