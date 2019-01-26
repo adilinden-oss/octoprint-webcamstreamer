@@ -26,6 +26,16 @@ class WebcamStreamerPlugin(octoprint.plugin.StartupPlugin,
         self.image = None
         self.container = None
     
+        self.frame_rate_default = 5
+        self.ffmpeg_cmd_default = (
+            "-re -f mjpeg -framerate 5 -i {webcam_url} "                                                                   # Video input
+            "-ar 44100 -ac 2 -acodec pcm_s16le -f s16le -ac 2 -i /dev/zero "                                               # Audio input
+            "-acodec aac -ab 128k "                                                                                        # Audio output
+            "-vcodec h264 -pix_fmt yuv420p -framerate {frame_rate} -g {gop_size} -strict experimental -filter:v {filter} " # Video output
+            "-f flv {stream_url}")                                                                                         # Output stream
+        self.docker_image_default = "adilinden/rpi-ffmpeg:latest"
+        self.docker_container_default = "WebStreamer"
+
     ##~~ StartupPlugin
     
     def on_after_startup(self):
@@ -56,14 +66,16 @@ class WebcamStreamerPlugin(octoprint.plugin.StartupPlugin,
             webcam_url = "",
             streaming = False,
             auto_start = False,
-            ffmpeg_cmd = "-re -f mjpeg -framerate 5 -i {webcam_url} "                                                                       # Video input
-                       + "-ar 44100 -ac 2 -acodec pcm_s16le -f s16le -ac 2 -i /dev/zero "                                                   # Audio input
-                       + "-acodec aac -ab 128k "                                                                                            # Audio output
-                       + "-vcodec h264 -pix_fmt yuv420p -framerate {frame_rate} -g {gop_size} -strict experimental -filter:v {filter} "     # Video output
-                       + "-f flv {stream_url}",                                                                                             # Output stream
-            frame_rate = 5,
-            docker_image = "adilinden/rpi-ffmpeg:latest",
-            docker_container = "WebStreamer"
+            ffmpeg_cmd = self.ffmpeg_cmd_default,
+            frame_rate = self.frame_rate_default,
+            docker_image = self.docker_image_default,
+            docker_container = self.docker_container_default,
+
+            # Default values
+            frame_rate_default = self.frame_rate_default,
+            ffmpeg_cmd_default = self.ffmpeg_cmd_default,
+            docker_image_default = self.docker_image_default,
+            docker_container_default = self.docker_container_default
         )
 
     ##~~ AssetPlugin mixin
