@@ -86,6 +86,9 @@ class WebcamStreamerPlugin(octoprint.plugin.StartupPlugin,
             docker_container_default = self.docker_container_default
         )
 
+    def get_settings_restricted_paths(self):
+        return dict(admin=[["stream_url"]])
+
     ##~~ AssetPlugin mixin
 
     def get_assets(self):
