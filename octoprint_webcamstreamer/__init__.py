@@ -189,7 +189,8 @@ class WebcamStreamerPlugin(octoprint.plugin.StartupPlugin,
                     detach = True,
                     privileged = True,
                     name = self._settings.get(["docker_container"]),
-                    auto_remove = True)
+                    auto_remove = True,
+					network_mode = "host")
             except Exception, e:
                 self._logger.error(str(e))
                 self._plugin_manager.send_plugin_message(self._identifier, dict(error=str(e),status=True,streaming=False))
