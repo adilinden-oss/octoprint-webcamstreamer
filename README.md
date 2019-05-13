@@ -21,8 +21,9 @@ Although this plugin should work with a wide variety of webcam, it has only been
 
 Using `ssh` access the OctoPi and install `docker`:
 
-    curl -sSL https://get.docker.com | sh
-    sudo usermod pi -aG docker
+    curl -fsSL get.docker.com -o get-docker.sh && sh get-docker.sh
+    sudo usermod -aG docker pi
+    sudo systemctl enable docker
     sudo reboot
 
 Pull the `adilinden/rpi-ffmpeg` image:
