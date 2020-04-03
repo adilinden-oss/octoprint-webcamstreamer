@@ -137,7 +137,7 @@ class WebcamStreamerPlugin(octoprint.plugin.StartupPlugin,
         self.client = docker.from_env()
         try:
             self.client.ping()
-        except Exception, e:
+        except Exception as e:
             self._logger.error("Docker not responding: " + str(e))
             self.client = None
 
@@ -146,7 +146,7 @@ class WebcamStreamerPlugin(octoprint.plugin.StartupPlugin,
         if self.client:
             try:
                 self.image = self.client.images.get(self._settings.get(["docker_image"]))
-            except Exception, e:
+            except Exception as e:
                 self._logger.error(str(e))
                 self._logger.error("Please read installation instructions!")
                 self.image = None
@@ -156,7 +156,7 @@ class WebcamStreamerPlugin(octoprint.plugin.StartupPlugin,
         if self.client:
             try:
                 self.container = self.client.containers.get(self._settings.get(["docker_container"]))
-            except Exception, e:
+            except Exception as e:
                 self.client = None
                 self.container = None
     
@@ -191,7 +191,7 @@ class WebcamStreamerPlugin(octoprint.plugin.StartupPlugin,
                     name = self._settings.get(["docker_container"]),
                     auto_remove = True,
 					network_mode = "host")
-            except Exception, e:
+            except Exception as e:
                 self._logger.error(str(e))
                 self._plugin_manager.send_plugin_message(self._identifier, dict(error=str(e),status=True,streaming=False))
             else:
@@ -205,7 +205,7 @@ class WebcamStreamerPlugin(octoprint.plugin.StartupPlugin,
             try:
                 self.container.stop()
                 self.container = None
-            except Exception, e:
+            except Exception as e:
                 self._logger.error(str(e))
                 self._plugin_manager.send_plugin_message(self._identifier, dict(error=str(e),status=True,streaming=False))
             else:
@@ -250,6 +250,7 @@ class WebcamStreamerPlugin(octoprint.plugin.StartupPlugin,
 # ("OctoPrint-PluginSkeleton"), you may define that here. Same goes for the other metadata derived from setup.py that
 # can be overwritten via __plugin_xyz__ control properties. See the documentation for that.
 __plugin_name__ = "WebcamStreamer Plugin"
+__plugin_pythoncompat__ = ">=2.7,<4"
 
 def __plugin_load__():
     global __plugin_implementation__
