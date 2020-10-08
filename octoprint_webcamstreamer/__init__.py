@@ -172,7 +172,7 @@ class WebcamStreamerPlugin(octoprint.plugin.StartupPlugin,
                 filters.append("transpose=cclock")
             if len(filters) == 0:
                 filters.append("null")
-            gop_size = self._settings.get(["frame_rate"]) * 2
+            gop_size = int(self._settings.get(["frame_rate"])) * 2
             # Substitute vars in ffmpeg command
             docker_cmd = self._settings.get(["ffmpeg_cmd"]).format(
                 webcam_url = self._settings.get(["webcam_url"]),
