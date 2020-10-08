@@ -21,9 +21,20 @@ Although this plugin should work with a wide variety of webcam, it has only been
 
 Using `ssh` access the OctoPi and install `docker`:
 
-    curl -sSL https://get.docker.com | sh
-    sudo usermod pi -aG docker
-    sudo reboot
+    curl -fsSL get.docker.com -o get-docker.sh && sh get-docker.sh
+    sudo usermod -aG docker pi
+    sudo systemctl enable docker
+    sudo reboot now
+    
+2-3 minutes after the reboot, ssh back in and test that docker is working:
+
+    docker run hello-world
+
+You should see something like this.
+
+<img src="https://cdn-images-1.medium.com/max/800/1*QtTDQb8cl_Mv-ZIT8fa9Lw.png">
+
+If not, [try this page](https://medium.freecodecamp.org/the-easy-way-to-set-up-docker-on-a-raspberry-pi-7d24ced073ef) for troubleshooting.
 
 Pull the `adilinden/rpi-ffmpeg` image:
 
